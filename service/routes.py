@@ -61,29 +61,61 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
 
+# ... place you code here to LIST accounts ...
+@app.route("/accounts", methods=["GET"])
+def list_accounts():
+    """It should list all accounts, no paging"""
+    accounts = Account.all()
+    account_list = [account.serialize() for account in accounts]
+    return jsonify(account_list), status.HTTP_200_OK
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
 
+# ... place you code here to READ an account ...
+@app.route("/accounts/<id>", methods=["GET"])
+def read_account(id):
+    """It should get a single account by id"""
+    account = Account()
+    found = account.find(id)
+    if not found:
+        abort(status.HTTP_404_NOT_FOUND, f"account with id [{id}] was not found")
+    else:
+        return found.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
 
+# ... place you code here to UPDATE an account ...
+@app.route("/accounts/<id>", methods=["PUT"])
+def update_account(id):
+    """It should update a single account"""
+    found = Account.find(id)
+    if not found:
+        abort(status.HTTP_404_NOT_FOUND, f"account with id [{id}] was not found")
+    else:
+        found.deserialize(request.get_json())
+        found.update()
+        return found.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE AN ACCOUNT
 ######################################################################
 
-# ... place you code here to DELETE an account ...
 
+# ... place you code here to DELETE an account ...
+@app.route("/accounts/<id>", methods=["DELETE"])
+def delete_account(id):
+    """It should delete a single account"""
+    found = Account.find(id)
+    if found:
+        found.delete()
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
